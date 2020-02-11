@@ -147,6 +147,7 @@ def isPointinPolygon(point, rangelist):
     if (point[0] > maxlng or point[0] < minlng or
         point[1] > maxlat or point[1] < minlat):
         return False
+    
     count = 0
     point1 = rangelist[0]
     for i in range(1, len(rangelist)):
@@ -164,8 +165,8 @@ def isPointinPolygon(point, rangelist):
             if (point12lng == point[0]):
                 #print("点在多边形边上")
                 return False
-            if (point12lng > point[0]):
-                count +=1
+            if (point12lng < point[0]):
+                count += 1
         point1 = point2
     #print(count)
     if count%2 == 0:
@@ -187,62 +188,47 @@ def showFig(key_points):
     #plt.savefig("res.jpg")
 
 def getGravity(p):
-    center_x = 0
-    center_y = 0
-    area = 0.0
+    center_x = 0.0
+    center_y = 0.0
+    cnt = 0
 
-    for i in range(len(p) - 1):
-        area = area + (p[i][0] * p[i + 1][1] - p[i + 1][0] * p[i][1]) / 2
-        center_x = center_x + (p[i][0] * p[i + 1][1] - p[i + 1][0] * p[i][1]) * (p[i][0] + p[i + 1][0])
-        center_y = center_y + (p[i][0] * p[i + 1][1] - p[i + 1][0] * p[i][1]) * (p[i][1] + p[i + 1][1])
+    for point in p:
+        center_x += point[0]
+        center_y += point[1]
+        cnt += 1
 
-    n = len(p)
-    area = area + (p[n - 1][0] * p[0][1] - p[0][0] * p[n - 1][1]) / 2
-    center_x = center_x + (p[n - 1][0] * p[0][1] - p[0][0] * p[n - 1][1]) * (p[n - 1][0] + p[0][0])
-    center_y = center_y + (p[n - 1][0] * p[0][1] - p[0][0] * p[n - 1][1]) * (p[n - 1][1] + p[0][1])
-    
-    center_x /= 6*area
-    center_y /= 6*area
-
-    #print(center_x, center_y)
-    return [center_x, center_y]
+    return [float(center_x) / cnt, float(center_y) / cnt]
 
 def cmp(a, b, center):
     if a[0] >= 0 and b[0] < 0:
-        return False
+        return True
     if a[0] == 0 and b[0] == 0:
-        return a[1] <= b[1]
-    
+        return a[1] > b[1]
     det = int((a[0] - center[0]) * (b[1] - center[1]) - (b[0] - center[0]) * (a[1] - center[1]))
     if det < 0:
-        return False
-    if det > 0:
         return True
-    d1 = int((a[0] - center[0]) * (a[0] - center[0]) + (a[1] - center[1]) * (a[1] - center[1]))
-    d2 = int((b[0] - center[0]) * (b[0] - center[0]) + (b[1] - center[1]) * (b[1] - center[1]))
-    return d1 <= d2
+    if det > 0:
+        return False
+    d1 = float((a[0] - center[0]) * (a[0] - center[0]) + (a[1] - center[1]) * (a[1] - center[1]))
+    d2 = float((b[0] - center[0]) * (b[0] - center[0]) + (b[1] - center[1]) * (b[1] - center[1]))
+    return d1 > d2
 
-def partition(arr, low, high, center): 
-    i = (low-1)         # 最小元素索引
-    pivot = arr[high]     
-  
-    for j in range(low , high): 
-  
-        # 当前元素小于或等于 pivot
-        if not cmp(arr[j], pivot, center): 
-            i = i+1 
-            arr[i],arr[j] = arr[j],arr[i] 
-  
-    arr[i+1],arr[high] = arr[high],arr[i+1] 
-    return (i+1) 
+def mySort(arr, center):
+    # 先按照x坐标排一遍，否则可能出现转角超过360的问题
+    for i in range(0, len(arr) - 1):
+        for j in range(0, len(arr) - i - 1):
+            if arr[j][0] > arr[j + 1][0]:
+                tmp = arr[j]
+                arr[j] = arr[j + 1]
+                arr[j + 1] = tmp
 
-def mySort(arr, low, high, center):
-    if low < high: 
-        pi = partition(arr,low,high,center) 
-  
-        mySort(arr, low, pi-1, center) 
-        mySort(arr, pi+1, high, center)
-
+    for i in range(0, len(arr) - 1):
+        for j in range(0, len(arr) - i - 1):
+            #print(i, j, j + 1)
+            if cmp(arr[j], arr[j + 1], center):
+                tmp = arr[j]
+                arr[j] = arr[j + 1]
+                arr[j + 1] = tmp
 
 def getFaceAlignment(input):
     fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='cpu')
@@ -340,9 +326,8 @@ if __name__ == "__main__":
     #print(convex_hull_boundary)
     #convex_hull_boundary = [[100, 100], [110, 100], [110, 120], [100, 120]]
     center = getGravity(convex_hull_boundary)
-    mySort(convex_hull_boundary, 0, len(convex_hull_boundary) - 1, center)
+    mySort(convex_hull_boundary, center)
     #print(convex_hull_boundary)
-    #boundarySort(convex_hull_boundary)
     #showFig(convex_hull_boundary)
     
     M = numpy.zeros((h, w))
