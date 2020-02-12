@@ -234,7 +234,7 @@ def getFaceAlignment(input):
     fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='cpu')
     return fa.get_landmarks(input)
 
-def getBlendedImg(M, background, foreground, output_path):
+def getBlendedImg(M, background, foreground, output_img_path):
     (h, w, c) = background.shape
 
     for y in range(h):
@@ -246,7 +246,7 @@ def getBlendedImg(M, background, foreground, output_path):
 
     #io.imshow(background)
     #io.show()
-    io.imsave(output_path, background)
+    io.imsave(output_img_path, background)
 
 def getFaceAlignment(input):
     fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='cpu')
@@ -303,13 +303,16 @@ if __name__ == "__main__":
     # image database for searching
     img_path =  sys.argv[2]
     # output path to save result
-    output_path = sys.argv[3]
+    output_img_path = sys.argv[3]
+    output_xray_path = sys.argv[4]
+
     h = 0
     w = 0
     c = 0
 
     background = io.imread(background_img_path)
     mask = io.imread(background_img_path)
+    xray = io.imread(background_img_path)
     #io.imshow(background)
     #io.show()
     (h, w, c) = background.shape
@@ -341,6 +344,7 @@ if __name__ == "__main__":
                 #print(M[y, x])
                 mask[y, x: ] = 255
             else:
+                M[y, x] = 0.0
                 mask[y, x: ] = 0
 
     B = numpy.zeros((h, w))
@@ -348,13 +352,15 @@ if __name__ == "__main__":
         for j in range(w):
             # eqn(2)
             B[i, j] = 4 * M[i, j] * (1 - M[i, j])
+            xray[i, j: ] = B[i, j] * 255.0
             #print(B[i, j])
 
     #print(B)
     #io.imshow(mask)
     #io.show()
     # eqn(1)
-    getBlendedImg(M, background, foreground, output_path)
+    io.imsave(output_xray_path, xray)
+    getBlendedImg(M, background, foreground, output_img_path)
     
     end_time = time.time()
     print('At cost: ', end_time - start_time)
