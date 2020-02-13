@@ -1,4 +1,5 @@
 import face_alignment
+import skimage
 from skimage import io, img_as_float
 import matplotlib.pyplot as plt
 from functools import cmp_to_key
@@ -338,28 +339,26 @@ if __name__ == "__main__":
     for y in range(h): # row
         for x in range(w): # col
             if isPointinPolygon([x, y], convex_hull_boundary):
-                # 按照paper中用平均值作为灰度值
-                M[y, x] = (int(background[y][x][0]) + int(background[y][x][1]) + int(background[y][x][2])) / float(3.0)
-                M[y, x] = M[y, x] / 255.0
-                #print(M[y, x])
-                mask[y, x: ] = 255
+                M[y, x] = 1.0
             else:
                 M[y, x] = 0.0
-                mask[y, x: ] = 0
+
+    M = skimage.filters.gaussian(M, sigma=1)
+    #print(M)
 
     B = numpy.zeros((h, w))
     for i in range(h):
         for j in range(w):
             # eqn(2)
             B[i, j] = 4 * M[i, j] * (1 - M[i, j])
-            xray[i, j: ] = B[i, j] * 255.0
+            #xray[i, j: ] = B[i, j] * 255.0
             #print(B[i, j])
 
     #print(B)
     #io.imshow(mask)
     #io.show()
     # eqn(1)
-    io.imsave(output_xray_path, xray)
+    io.imsave(output_xray_path, B)
     getBlendedImg(M, background, foreground, output_img_path)
     
     end_time = time.time()
