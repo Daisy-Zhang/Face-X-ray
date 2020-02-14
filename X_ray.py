@@ -232,7 +232,7 @@ def mySort(arr, center):
                 arr[j + 1] = tmp
 
 def getFaceAlignment(input):
-    fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='cpu')
+    fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='gpu')
     return fa.get_landmarks(input)
 
 def getBlendedImg(M, background, foreground, output_img_path):
@@ -248,10 +248,6 @@ def getBlendedImg(M, background, foreground, output_img_path):
     #io.imshow(background)
     #io.show()
     io.imsave(output_img_path, background)
-
-def getFaceAlignment(input):
-    fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='cpu')
-    return fa.get_landmarks(input)
 
 def calEuclDis(v1, v2):
     if len(v1) != len(v2):
