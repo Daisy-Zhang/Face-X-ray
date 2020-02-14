@@ -14,6 +14,6 @@ for filename in os.listdir(background_path):
 		cmd = 'python3 X_ray.py ' + background_path + filename + ' ' + img_db_path + ' ' + output_fake_path + 'output_' + filename + ' ' + x_ray_fake_path + 'x_ray_' + filename
 		print(cmd)
 		os.system(cmd)
-		# cmd = 'python3 X_ray_real.py ' + background_path + filename + ' ' + output_real_path + 'output_' + filename + ' ' + x_ray_real_path + 'x_ray_' + filename
-		# print(cmd)
-		# os.system(cmd)
+		cmd = 'python3 X_ray_real.py ' + background_path + filename + ' ' + output_real_path + 'output_' + filename + ' ' + x_ray_real_path + 'x_ray_' + filename
+		print(cmd)
+		os.system(cmd)

@@ -287,6 +287,10 @@ def nearestSearch(b_key_points, path, b_h, b_w, b_c):
         key_points = getFaceAlignment(img)
 
         dis = calEuclDis(b_key_points, key_points[0])
+
+        if dis < 0.001:
+            continue
+        
         #break
         #print(dis)
         if dis < min_dis:
