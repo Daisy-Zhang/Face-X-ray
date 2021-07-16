@@ -1,5 +1,5 @@
 # Face_X-ray
-This is a un official implementation of *Lingzhi Li, Jianmin Bao, Ting Zhang, Hao Yang, Dong Chen, Fang Wen, Baining Guo: Face X-Ray for More General Face Forgery Detection. CVPR 2020: 5000-5009*.
+This is an unofficial implementation of *Lingzhi Li, Jianmin Bao, Ting Zhang, Hao Yang, Dong Chen, Fang Wen, Baining Guo: Face X-Ray for More General Face Forgery Detection. CVPR 2020: 5000-5009*.
 
 ## Install Dependancies
 
